@@ -1,0 +1,44 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\hasPermission;
+
+class Post extends Model
+{
+    use HasFactory, SoftDeletes, hasPermission;
+
+    protected $table = 'posts';
+    protected $fillable = [
+        'name',
+        'slug',
+        'description',
+        'status',
+        'type',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'categories_posts', 'post_id', 'category_id');
+    }
+
+    public function users(){
+        return $this->belongsTo(User::class);
+    }
+
+    public function post_metas()
+    {
+        return $this->HasMany(PostMetal::class);
+    }
+
+    public function post_detail()
+    {
+        return $this->hasMany(PostDetail::class);
+    }
+}

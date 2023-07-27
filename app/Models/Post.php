@@ -24,12 +24,17 @@ class Post extends Model
         'deleted_at',
     ];
 
+    protected $casts = [
+        'upload_id' => 'array'
+    ];
+
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'categories_posts', 'post_id', 'category_id');
     }
 
-    public function users(){
+    public function users()
+    {
         return $this->belongsTo(User::class);
     }
 
@@ -41,10 +46,5 @@ class Post extends Model
     public function post_detail()
     {
         return $this->hasMany(PostDetail::class);
-    }
-
-    public function uploads()
-    {
-        return $this->morphMany(Upload::class, 'upload');
     }
 }

@@ -14,12 +14,8 @@ class Upload extends Model
         'url',
         'thumbnail',
         'user_id',
-        'type',
     ];
 
-    public function upload(){
-        return $this->morphTo();
-    }
 
     public function users(){
         return $this->belongsTo(User::class, 'user_id');

@@ -18,6 +18,7 @@ class Post extends Model
         'description',
         'status',
         'type',
+        'upload_id',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -40,5 +41,10 @@ class Post extends Model
     public function post_detail()
     {
         return $this->hasMany(PostDetail::class);
+    }
+
+    public function uploads()
+    {
+        return $this->morphMany(Upload::class, 'upload');
     }
 }

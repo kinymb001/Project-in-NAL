@@ -37,4 +37,8 @@ class Category extends Model
         return $this->hasMany(Article::class);
     }
 
+    public function uploads()
+    {
+        return $this->morphMany(Upload::class, 'upload');
+    }
 }

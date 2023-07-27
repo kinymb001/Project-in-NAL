@@ -30,4 +30,9 @@ class Article extends Model
     public function articleDetails(){
         return $this->hasMany(ArticleDetail::class);
     }
+
+    public function uploads()
+    {
+        return $this->morphMany(Upload::class, 'upload');
+    }
 }

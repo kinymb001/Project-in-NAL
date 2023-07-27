@@ -49,16 +49,15 @@ class PostController extends BaseController
 
         $rules = [
             'name' => 'required|max:255',
-            'status' => 'required|in:public,unpublic',
-            'image' =>  'image|mimes:png,jpg,jpeg,svg|max:10240',
-            'category_id' => 'required|array',
+            'status' => 'required|in:public,un_public',
+            'categories' => 'required|array',
             'meta_keys' => 'array',
             'meta_values' => 'array',
         ];
         $msg = [
             'name.required' => 'Name must enter',
             'status.required' => 'Status must enter',
-            'status.in' => 'Status has two value are public or unpublic'
+            'status.in' => 'Status has two value are public or un_public'
         ];
         $request->validate($rules, $msg);
 
@@ -69,6 +68,7 @@ class PostController extends BaseController
         $post->description = $request->description;
         $post->status = $request->status;
         $post->type = $request->type;
+        $post->upload_id = $request->upload_id;
 
         $post->save();
 
@@ -79,7 +79,7 @@ class PostController extends BaseController
             $name =  translate($language, $request->name);
             $post_detail->name = $name;
             $post_detail->slug = Str::of($name)->slug('-');
-            $post_detail->decription = translate($language, $request->description);
+            $post_detail->description = translate($language, $request->description);
             $post_detail->post_id = $post->id;
             $post_detail->language = $language;
             $post_detail->save();
@@ -94,14 +94,8 @@ class PostController extends BaseController
                 $value = $meta_values[$i];
                 $post_meta->post_ID = $post->id;
                 $post_meta->meta_key = $meta_key;
+                $post_meta->meta_value = $value;
 
-                if(is_file($value)){
-                    $name = Str::random(10);
-                    $path = $value->storeAs('public/post/' . date('Y/m/d'), $name);
-                    $post_meta->meta_value = asset(Storage::url($path));
-                }else{
-                    $post_meta->meta_value = $value;
-                }
                 $post_meta->save();
             }
         }
@@ -116,6 +110,7 @@ class PostController extends BaseController
         $post->catrgoris = $post->categories()->where('status', 'public');
         $post->post_metas = $post->post_metas()->get();
         $post->post_detail = $post->post_detail()->get();
+        $post->uploads = $post->uploads()->get();
         return $this->handleResponseSuccess('Get Post successfully', $post);
     }
 

@@ -107,7 +107,7 @@ class PostController extends BaseController
 
     public function show(Post $post)
     {
-        $post->catrgoris = $post->categories()->where('status', 'public');
+        $post->categoris = $post->categories()->where('status', 'public');
         $post->post_metas = $post->post_metas()->get();
         $post->post_detail = $post->post_detail()->get();
         $post->uploads = $post->uploads()->get();

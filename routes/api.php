@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\Admin\UploadController;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\User;
@@ -78,5 +79,8 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::post('/category/create', [CategoryController::class, 'store'])->can('create', Category::class);
     Route::post('/category/update/{category}',  [CategoryController::class, 'update'])->can('update', Category::class);
     Route::delete('/category/delete/{category}',  [CategoryController::class, 'destroy'])->can('delete', Category::class);
+
+    //route for upload
+    Route::post('/upload/store', [UploadController::class, 'store']);
 });
 

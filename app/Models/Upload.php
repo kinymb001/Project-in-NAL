@@ -21,5 +21,16 @@ class Upload extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function post()
+    {
+        return $this->belongsTo(Post::class);
+    }
 
+    public function category(){
+        return $this->belongsTo(Category::class);
+    }
+
+    public function article(){
+        return $this->belongsTo(Article::class);
+    }
 }

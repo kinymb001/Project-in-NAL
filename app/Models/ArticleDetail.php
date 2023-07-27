@@ -10,6 +10,7 @@ class ArticleDetail extends Model
     use HasFactory;
     protected $table = 'articles';
     protected $fillable = [
+        'article_id',
         'name',
         'slug',
         'description',

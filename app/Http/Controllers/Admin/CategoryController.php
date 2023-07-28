@@ -44,25 +44,22 @@ class CategoryController extends BaseController
             return $this->handleResponseErros(null, 'Unauthorized')->setStatusCode(403);
         }
 
-        $rules = [
+        $request->validate([
             'name' => 'required|max:255',
-            'status' => 'required|in:public,unpublic',
-            'image' => 'image|mimes:png,jpg,jpeg,svg|max:10240',
-            'type' => 'required',
-            'description' => 'required',
-        ];
-        $msg = [
-            'name.required' => 'Name must enter',
-            'status.required' => 'Status must enter',
-            'status.in' => 'Status has two value are true or false',
-        ];
-        $request->validate($rules, $msg);
+            'status' => 'required|in:pending,published',
+            'upload_ids' => 'array'
+        ]);
+
         $category = new Category();
         $category->user_ID = Auth::id();
         $category->name = $request->name;
         $category->slug = Str::of($request->name)->slug('-');
         $category->description = $request->description;
         $category->status = $request->status;
+        $category->upload_id = $request->upload_ids;
+        if ($request->upload_ids){
+            deleteImage($request->upload_ids);
+        }
         $category->type = $request->type;
         if ($request->hasFile('image')) {
             $image = $request->image;
@@ -86,33 +83,21 @@ class CategoryController extends BaseController
             return $this->handleResponseErros(null, 'Unauthorized')->setStatusCode(403);
         }
 
-        $rules = [
+        $request->validate([
             'name' => 'required|max:255',
-            'status' => 'required|in:public,unpublic',
-            'image' => 'image|mimes:png,jpg,jpeg,svg|max:10240',
-            'type' => 'required',
-            'description' => 'required',
-        ];
-        $msg = [
-            'name.required' => 'Name must enter',
-            'status.required' => 'Status must enter',
-            'status.in' => 'Status has two value are true or false',
-        ];
-        $request->validate($rules, $msg);
+            'status' => 'required|in:pending,published',
+            'upload_ids' => 'array'
+        ]);
 
         $category->name = $request->name;
         $category->slug = Str::of($request->name)->slug('-');
         $category->description = $request->description;
         $category->status = $request->status;
         $category->type = $request->type;
-        if ($request->hasFile('image')) {
-            $oldPath = 'public' . Str::after($category->url, 'storage');
-            Storage::delete($oldPath);
-            $image = $request->image;
-            $imagePath = $image->storeAs('public/upload/' . date('Y/m/d'), Str::random(10));
-            $category->image_url = asset(Storage::url($imagePath));
+        $category->upload_id = $request->upload_ids;
+        if ($request->upload_ids){
+            deleteImage($request->upload_ids);
         }
-
         $category->update();
         return $this->handleResponseSuccess($category, 'Update Category Successfully!');
     }

@@ -17,11 +17,11 @@ class CreateUploadsTable extends Migration
             $table->id();
             $table->string('url');
             $table->string('thumbnail');
+            $table->enum('status', ['pending', 'active'])->default('pending');
             $table->foreignId('user_id')
                 ->references('id')
                 ->on('users')
                 ->onDelete('cascade');
-            $table->morphs('upload');
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
         });

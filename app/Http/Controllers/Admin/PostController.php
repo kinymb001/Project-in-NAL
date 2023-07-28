@@ -8,9 +8,7 @@ use App\Models\PostDetail;
 use App\Models\PostMetal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class PostController extends BaseController
 {
@@ -47,19 +45,12 @@ class PostController extends BaseController
             return $this->handleResponseErros(null, 'Unauthorized')->setStatusCode(403);
         }
 
-        $rules = [
+        $request->validate([
             'name' => 'required|max:255',
-            'status' => 'required|in:public,un_public',
+            'status' => 'required|in:pending,published',
             'categories' => 'required|array',
-            'meta_keys' => 'array',
-            'meta_values' => 'array',
-        ];
-        $msg = [
-            'name.required' => 'Name must enter',
-            'status.required' => 'Status must enter',
-            'status.in' => 'Status has two value are public or un_public'
-        ];
-        $request->validate($rules, $msg);
+            'upload_ids' => 'array'
+        ]);
 
         $post = new Post();
         $post->user_ID = Auth::id();
@@ -69,6 +60,9 @@ class PostController extends BaseController
         $post->status = $request->status;
         $post->type = $request->type;
         $post->upload_id = $request->upload_id;
+        if ($request->upload_ids){
+            deleteImage($request->upload_ids);
+        }
 
         $post->save();
 
@@ -120,52 +114,38 @@ class PostController extends BaseController
             return $this->handleResponseErros(null, 'Unauthorized')->setStatusCode(403);
         }
 
-        $rules = [
+        $request->validate([
             'name' => 'required|max:255',
-            'status' => 'required|in:public,unpublic',
-            'image' =>  'image|mimes:png,jpg,jpeg,svg|max:10240',
-            'category_id' => 'required|array',
-            'meta_keys' => 'array',
-            'meta_values' => 'array',
-        ];
-        $msg = [
-            'name.required' => 'Name must enter',
-            'status.required' => 'Status must enter',
-            'status.in' => 'Status has two value are public or unpublic'
-        ];
-        $request->validate($rules, $msg);
+            'status' => 'required|in:pending,published',
+            'categories' => 'required|array',
+            'upload_ids' => 'array'
+        ]);
 
 
         $post->name = $request->name;
         $post->slug = Str::of($request->name)->slug('-');
         $post->description = $request->description;
         $post->status = $request->status;
+        $post->upload_id = $request->upload_id;
+        if ($request->upload_ids){
+            deleteImage($request->upload_ids);
+        }
         $post->type = $request->type;
         $post->save();
         $post->categories()->sync($request->input('categories', []));
         $post->post_detail()->delete();
 
-        $translator = new GoogleTranslate();
         $languages = config('app.language_array');
         foreach($languages as $language){
             $post_detail = new PostDetail();
-            $post_detail->name = $translator->setSource('en')->setTarget($language)->translate($request->name);
-            $post_detail->description = $translator->setSource('en')->setTarget($language)->translate($request->description);
+            $post_detail->name = translate($language, $request->name);
+            $post_detail->description = translate($language, $request->description);
             $post_detail->post_id = $post->id;
             $post_detail->language = $language;
             $post_detail->save();
         }
 
         if($request->has('meta_key') && $request->has('meta_value')){
-            $post_metas = $post->post_metas()->get();
-            foreach ($post_metas as $post_meta){
-                $value = $post_meta->meta_value;
-                if (filter_var($value, FILTER_VALIDATE_URL) !== false) {
-                    $path = 'public' . Str::after($post_meta->value, 'storage');
-                    Storage::delete($path);
-                }
-                $post_meta->delete();
-            }
             $meta_keys = $request->meta_key;
             $meta_values = $request->meta_value;
 
@@ -174,14 +154,7 @@ class PostController extends BaseController
                 $value = $meta_values[$i];
                 $post_meta->post_ID = $post->id;
                 $post_meta->meta_key = $meta_key;
-
-                if(is_file($value)){
-                    $name = Str::random(10);
-                    $path = $value->storeAs('public/post/' . date('Y/m/d'), $name);
-                    $post_meta->meta_value = asset(Storage::url($path));
-                }else{
-                    $post_meta->meta_value = $value;
-                }
+                $post_meta->meta_value = $value;
                 $post_meta->save();
             }
         }
@@ -245,12 +218,8 @@ class PostController extends BaseController
             $post->withTrashed()->whereIn('id', $ID_delete)->forceDelete();
             $post_metas = PostMetal::whereIn('post_id', $ID_delete)->get();
 
-            foreach ($post_metas as $post_meta) {
-                $path = parse_url($post_meta->url, PHP_URL_PATH);
-                $old_path = str_replace('/storage', '/public', $path);
-                Storage::delete($old_path);
+           $post_metas->delete();
             }
             return $this->handleResponseSuccess('Post hardDelete successfully!', []);
         }
-    }
 }

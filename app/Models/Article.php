@@ -13,7 +13,7 @@ class Article extends Model
         'name',
         'slug',
         'description',
-        'content',
+        'contents',
         'seo_title',
         'seo_description',
         'status',

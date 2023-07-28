@@ -13,7 +13,7 @@ class ArticleDetail extends Model
         'name',
         'slug',
         'description',
-        'content',
+        'contents',
         'language',
         'article_id',
     ];

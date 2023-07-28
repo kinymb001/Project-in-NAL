@@ -18,7 +18,7 @@ class CreateArticleDetailsTable extends Migration
             $table->string('name');
             $table->string('slug')->index()->unique();
             $table->text('description')->nullable();
-            $table->longText('content')->nullable();
+            $table->longText('contents')->nullable();
             $table->string('language')->nullable();
             $table->foreignId('article_id')
                 ->references('id')

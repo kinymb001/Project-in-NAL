@@ -44,7 +44,8 @@
         },
         "files": [
             "app/Helpers/Translate.php",
-            "app/Helpers/UploadHepler.php"
+            "app/Helpers/UploadHepler.php",
+            "app/Helpers/DeleteImage.php"
         ]
     },
     "autoload-dev": {

@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BaseController;
+use App\Mail\ApproveMail;
+use App\Models\Article;
 use App\Models\User;
 use App\Models\UserMetal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends BaseController
 {
@@ -148,8 +151,6 @@ class AuthController extends BaseController
 
     public function unFavorite(Request  $request){
 
-        //$this->authorize('unFavorite',  $user_Meta);
-
         $request->validate([
             'values' => 'required|array',
         ]);
@@ -162,4 +163,38 @@ class AuthController extends BaseController
 
         return $this->handleResponseSuccess(null, 'you have unFavorited');
     }
+
+    public function approve(Request $request, Article $article)
+    {
+        $validated = $request->validate([
+            'status' => 'required|string|in:published,reject',
+            'comment' => 'nullable|string',
+        ]);
+
+        $author_email = $article->user->email;
+
+        $old_status = $article->status;
+        $new_status = $validated['status'];
+
+        if ($old_status === $new_status) {
+            return $this->handleResponseErros([], 'Invalid status');
+        }
+
+        if ($new_status === 'published') {
+            $article->status = 'published';
+            $article->save();
+            Mail::to($author_email)->send(new ApproveMail($article, 'published'));
+        } elseif ($new_status === 'reject') {
+            $reason = $validated['comment'] ?? '';
+            Mail::to($author_email)->send(new ApproveMail($article, 'reject', $reason));
+
+            $article->status = 'pending';
+            $article->save();
+        } else {
+            return $this->handleResponseErros([], 'Invalid status');
+        }
+
+        return $this->handleResponseSuccess($article, 'Article status updated successfully');
+    }
+
 }

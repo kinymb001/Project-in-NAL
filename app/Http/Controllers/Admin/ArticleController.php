@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BaseController;
 use App\Models\Article;
 use App\Models\ArticleDetail;
+use App\Models\Upload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -45,18 +46,14 @@ class ArticleController extends BaseController
             return $this->handleResponseErros(null, 'Unauthorized')->setStatusCode(403);
         }
 
-        $rules = [
+        $request->validate([
             'name' => 'required|max:255',
-            'status' => 'required|in:public,unpublic',
-            'type' => 'required',
-            'description' => 'required',
-        ];
-        $msg = [
-            'name.required' => 'Name must enter',
-            'status.required' => 'Status must enter',
-            'status.in' => 'Status has two value are true or false',
-        ];
-        $request->validate($rules, $msg);
+            'status' => 'required|in:pending,published',
+            'categories' => 'required|array',
+            'content' => 'required',
+            'upload_ids' => 'array'
+        ]);
+
         $article = new Article();
         $article->user_ID = Auth::id();
         $article->name = $request->name;
@@ -64,8 +61,11 @@ class ArticleController extends BaseController
         $article->description = $request->description;
         $article->status = $request->status;
         $article->type = $request->type;
-        $article->upload_id = $request->upload_id;
+        if ($request->upload_ids){
+            deleteImage($request->upload_ids);
+        }
         $article->save();
+        $article->categories()->sync($request->input('categories', []));
 
         $languages = config('app.language_array');
         foreach($languages as $language){
@@ -86,7 +86,7 @@ class ArticleController extends BaseController
     {
         $article->categoris = $article->categories()->where('status', 'public');
         $article->article_detail = $article->articleDetails()->get();
-        $article->uploads = $article->uploads()->get();
+        $article->uploads = Upload::find($article->upload_id);
         return $this->handleResponseSuccess('Get article successfully', $article);
     }
 
@@ -96,28 +96,25 @@ class ArticleController extends BaseController
             return $this->handleResponseErros(null, 'Unauthorized')->setStatusCode(403);
         }
 
-        $rules = [
+        $request->validate([
             'name' => 'required|max:255',
-            'status' => 'required|in:public,un_public',
-            'category_id' => 'required|array',
-        ];
-        $msg = [
-            'name.required' => 'Name must enter',
-            'status.required' => 'Status must enter',
-            'status.in' => 'Status has two value are public or unpublic'
-        ];
-        $request->validate($rules, $msg);
-
+            'status' => 'required|in:pending,published',
+            'categories' => 'required|array',
+            'content' => 'required',
+            'upload_ids' => 'array'
+        ]);
 
         $article->name = $request->name;
         $article->slug = Str::of($request->name)->slug('-');
         $article->description = $request->description;
-        $article->status = $request->status;
-        $article->type = $request->type;
+        $article->content = $request->contents;
+        $article->upload_id = $request->upload_ids;
+        if ($request->upload_ids){
+            deleteImage($request->upload_ids);
+        }
         $article->save();
         $article->categories()->sync($request->input('categories', []));
         $article->articleDetails()->delete();
-
         $languages = config('app.language_array');
         foreach($languages as $language){
             $article_detail = new ArticleDetail();
@@ -125,6 +122,7 @@ class ArticleController extends BaseController
             $article_detail->name = $name;
             $article_detail->slug = Str::of($name)->slug('-');
             $article_detail->description = translate($language, $request->description);
+            $article_detail->content = translate($language, $request->contents);
             $article_detail->article_id = $article->id;
             $article_detail->language = $language;
             $article_detail->save();
@@ -138,6 +136,7 @@ class ArticleController extends BaseController
             'language'=> 'required|string|max: 10',
             'name' => 'required|string|max: 255',
             'description' => 'string',
+            'content' => 'required',
         ]);
 
         $language = $request->language;
@@ -145,6 +144,7 @@ class ArticleController extends BaseController
         $article_detail = $article->articleDetails()->where('lang', $language)->first();
         $article_detail->name = $request->name;
         $article_detail->description = $request->description;
+        $article_detail->content = $request->contents;
         $article_detail->save();
 
         return $this->handleResponseSuccess($article_detail, 'Article detail updated successfully');

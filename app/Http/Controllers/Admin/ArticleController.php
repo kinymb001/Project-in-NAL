@@ -48,7 +48,6 @@ class ArticleController extends BaseController
         $rules = [
             'name' => 'required|max:255',
             'status' => 'required|in:public,unpublic',
-            'image' => 'image|mimes:png,jpg,jpeg,svg|max:10240',
             'type' => 'required',
             'description' => 'required',
         ];

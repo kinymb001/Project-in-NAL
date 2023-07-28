@@ -19,10 +19,10 @@ class CreateArticlesTable extends Migration
             $table->string('slug')->index()->unique();
             $table->text('description')->nullable();
             $table->longText('content')->nullable();
-            $table->string('upload_id')->nullable();
             $table->string('seo_title')->nullable();
             $table->string('seo_description')->nullable();
             $table->enum('status', ['pending', 'published'])->default('pending');
+            $table->string('upload_id')->nullable();
             $table->foreignId('user_id')
                 ->references('id')
                 ->on('users')

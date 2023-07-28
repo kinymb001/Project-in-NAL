@@ -20,6 +20,10 @@ class CreateArticleDetailsTable extends Migration
             $table->text('description')->nullable();
             $table->longText('content')->nullable();
             $table->string('language')->nullable();
+            $table->foreignId('article_id')
+                ->references('id')
+                ->on('articles')
+                ->onDelete('cascade');
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
         });

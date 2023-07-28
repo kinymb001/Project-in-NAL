@@ -14,10 +14,11 @@ class Article extends Model
         'slug',
         'description',
         'content',
-        'view',
-        'thumbnail',
+        'seo_title',
+        'seo_description',
+        'status',
+        'upload_id',
         'user_id',
-        'category_id',
     ];
 
     public function users(){
@@ -25,14 +26,10 @@ class Article extends Model
     }
 
     public function categories(){
-        return $this->belongsTo(Category::class);
+        return $this->belongsToMany(Category::class, 'article_category', 'article_id', 'category_id');
     }
     public function articleDetails(){
         return $this->hasMany(ArticleDetail::class);
     }
 
-    public function uploads()
-    {
-        return $this->hasMany(Upload::class);
-    }
 }

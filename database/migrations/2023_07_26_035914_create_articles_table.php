@@ -19,17 +19,13 @@ class CreateArticlesTable extends Migration
             $table->string('slug')->index()->unique();
             $table->text('description')->nullable();
             $table->longText('content')->nullable();
-            $table->integer('view')->default(0);
-            $table->string('thumbnail')->nullable();
-
+            $table->string('upload_id')->nullable();
+            $table->string('seo_title')->nullable();
+            $table->string('seo_description')->nullable();
+            $table->enum('status', ['pending', 'published'])->default('pending');
             $table->foreignId('user_id')
                 ->references('id')
                 ->on('users')
-                ->onDelete('cascade');
-
-            $table->foreignId('category_id')
-                ->references('id')
-                ->on('categories')
                 ->onDelete('cascade');
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();

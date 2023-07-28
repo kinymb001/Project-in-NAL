@@ -24,6 +24,7 @@ class CreatePostsTable extends Migration
             $table->longText('description');
             $table->enum('status', ['public', 'un_public'])->default('public');
             $table->string('type');
+            $table->string('upload_id')->nullable();
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
         });

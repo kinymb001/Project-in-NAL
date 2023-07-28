@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddUploadIdToPostsTable extends Migration
+class CreatePevisionTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,9 @@ class AddUploadIdToPostsTable extends Migration
      */
     public function up()
     {
-        Schema::table('posts', function (Blueprint $table) {
-            $table->text('upload_id')->nullable();
+        Schema::create('pevision', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
         });
     }
 
@@ -25,8 +26,6 @@ class AddUploadIdToPostsTable extends Migration
      */
     public function down()
     {
-        Schema::table('posts', function (Blueprint $table) {
-            $table->dropColumn('upload_id');
-        });
+        Schema::dropIfExists('pevision');
     }
 }

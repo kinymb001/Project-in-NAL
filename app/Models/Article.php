@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\hasPermission;
 
 class Article extends Model
 {
-    use HasFactory;
+    use HasFactory, hasPermission;
     protected $table = 'articles';
     protected $fillable = [
         'name',
@@ -32,4 +33,7 @@ class Article extends Model
         return $this->hasMany(ArticleDetail::class);
     }
 
+    public function revisions(){
+        return $this->hasMany(Revision::class);
+    }
 }

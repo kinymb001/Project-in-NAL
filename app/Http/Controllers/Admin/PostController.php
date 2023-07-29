@@ -126,8 +126,8 @@ class PostController extends BaseController
         $post->slug = Str::of($request->name)->slug('-');
         $post->description = $request->description;
         $post->status = $request->status;
-        $post->upload_id = $request->upload_id;
         if ($request->upload_ids){
+            $post->upload_id = $request->upload_id;
             deleteImage($request->upload_ids);
         }
         $post->type = $request->type;

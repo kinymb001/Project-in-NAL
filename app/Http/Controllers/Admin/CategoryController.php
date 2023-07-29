@@ -56,8 +56,8 @@ class CategoryController extends BaseController
         $category->slug = Str::of($request->name)->slug('-');
         $category->description = $request->description;
         $category->status = $request->status;
-        $category->upload_id = $request->upload_ids;
         if ($request->upload_ids){
+            $category->upload_id = $request->upload_ids;
             deleteImage($request->upload_ids);
         }
         $category->type = $request->type;

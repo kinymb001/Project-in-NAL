@@ -13,15 +13,17 @@ use Illuminate\Support\Str;
 class ArticleController extends BaseController
 {
 
+    const SEO_KEYS = ['Article', 'Development', 'SEO'];
+
     public function index(Request $request)
     {
         $status = $request->input('status');
-        $layout_status = ['public', 'un_public'];
+        $layout_status = ['pending', 'published', 'reject'];
         $sort = $request->input('sort');
         $sort_types = ['desc', 'asc'];
         $sort_option = ['name', 'created_at', 'updated_at'];
         $sort_by = $request->input('sort_by');
-        $status = in_array($status, $layout_status) ? $status : 'public';
+        $status = in_array($status, $layout_status) ? $status : 'published';
         $sort = in_array($sort, $sort_types) ? $sort : 'desc';
         $sort_by = in_array($sort_by, $sort_option) ? $sort_by : 'created_at';
         $search = $request->input('query');
@@ -48,20 +50,26 @@ class ArticleController extends BaseController
 
         $request->validate([
             'name' => 'required|max:255',
-            'status' => 'required|in:pending,published',
             'categories' => 'required|array',
             'content' => 'required',
             'upload_ids' => 'array'
         ]);
 
+        $keywords = self::SEO_KEYS;
+        $get_title = implode(" - ", $keywords) . " - " . $request->title;
+        $get_des = Str::limit($request->description, 150);
+
         $article = new Article();
-        $article->user_ID = Auth::id();
+        $article->user_id = Auth::id();
         $article->name = $request->name;
         $article->slug = Str::of($request->name)->slug('-');
         $article->description = $request->description;
-        $article->status = $request->status;
+        $article->seo_title = $get_title;
+        $article->seo_description = $get_des;
+        $article->status = 'pending';
         $article->type = $request->type;
         if ($request->upload_ids){
+            $article->upload_id = $request->upload_id;
             deleteImage($request->upload_ids);
         }
         $article->save();
@@ -96,20 +104,31 @@ class ArticleController extends BaseController
             return $this->handleResponseErros(null, 'Unauthorized')->setStatusCode(403);
         }
 
+        if($article->status === 'published'){
+            return $this->handleResponseErros([], 'Article is public');
+        }
+
         $request->validate([
             'name' => 'required|max:255',
-            'status' => 'required|in:pending,published',
+            'status' => 'required|in:pending,published,reject',
             'categories' => 'required|array',
             'content' => 'required',
             'upload_ids' => 'array'
         ]);
 
+        $keywords = self::SEO_KEYS;
+        $get_title = implode(" - ", $keywords) . " - " . $request->title;
+        $get_des = Str::limit($request->description, 150);
+
         $article->name = $request->name;
         $article->slug = Str::of($request->name)->slug('-');
         $article->description = $request->description;
+        $article->seo_title = $get_title;
+        $article->seo_description = $get_des;
+        $article->status = 'pending';
         $article->content = $request->contents;
-        $article->upload_id = $request->upload_ids;
         if ($request->upload_ids){
+            $article->upload_id = $request->upload_ids;
             deleteImage($request->upload_ids);
         }
         $article->save();

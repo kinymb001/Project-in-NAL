@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateArticleDetailsTable extends Migration
+class CreateRevisionDetailTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateArticleDetailsTable extends Migration
      */
     public function up()
     {
-        Schema::create('article_details', function (Blueprint $table) {
+        Schema::create('revision_detail', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('slug')->index()->unique();
@@ -22,12 +22,12 @@ class CreateArticleDetailsTable extends Migration
             $table->string('language')->nullable();
             $table->string('seo_title')->nullable();
             $table->string('seo_description')->nullable();
-            $table->foreignId('article_id')
+            $table->foreignId('article_id');
+            $table->foreignId('revision_id')
                 ->references('id')
-                ->on('articles')
+                ->on('revision')
                 ->onDelete('cascade');
             $table->timestamps();
-            $table->timestamp('deleted_at')->nullable();
         });
     }
 
@@ -38,6 +38,6 @@ class CreateArticleDetailsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('article_details');
+        Schema::dropIfExists('revision_detail');
     }
 }

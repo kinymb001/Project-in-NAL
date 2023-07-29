@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\Admin\RevisionController;
 use App\Http\Controllers\Admin\UploadController;
 use App\Models\Category;
 use App\Models\Post;
@@ -82,5 +83,13 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 
     //route for upload
     Route::post('/upload/store', [UploadController::class, 'store']);
+
+    //route for revision
+    Route::get('/revisions', [RevisionController::class, 'index']);
+    Route::post('/revision/create', [RevisionController::class, 'store']);
+    Route::get('/revision/{revision}', [RevisionController::class]);
+    Route::delete('/revision/{revision}', [RevisionController::class, 'destroy']);
+    Route::post('/revision/approve/{id}', [RevisionController::class, 'approve']);
+
 });
 

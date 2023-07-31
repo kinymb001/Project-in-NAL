@@ -59,8 +59,8 @@ class PostController extends BaseController
         $post->description = $request->description;
         $post->status = $request->status;
         $post->type = $request->type;
-        $post->upload_id = $request->upload_id;
         if ($request->upload_ids){
+            $post->upload_id = $request->upload_id;
             deleteImage($request->upload_ids);
         }
 

@@ -5,15 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BaseController;
 use App\Models\Article;
 use App\Models\ArticleDetail;
-use App\Models\Revision;
+use App\Models\RevisionArticle;
 use App\Models\RevisionDetail;
 use App\Models\Upload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class RevisionController extends BaseController
+class RevisionArticleController extends BaseController
 {
     const SEO_KEYS = ['Article', 'Development', 'SEO'];
 
@@ -30,7 +29,7 @@ class RevisionController extends BaseController
         $search = $request->input('query');
         $limit = request()->input('limit') ?? config('app.paginate');
 
-        $query = Revision::select('*');
+        $query = RevisionArticle::select('*');
 
         if ($status) {
             $query = $query->where('status', $status);
@@ -61,7 +60,7 @@ class RevisionController extends BaseController
         $get_title = implode(" - ", $keywords) . " - " . $request->title;
         $get_des = Str::limit($request->description, 150);
 
-        $revision = new Revision();
+        $revision = new RevisionArticle();
         $revision->user_id = $article->user_id;
         $revision->name = $request->name;
         $revision->slug = Str::of($request->name)->slug('-');
@@ -72,7 +71,7 @@ class RevisionController extends BaseController
         $revision->type = $request->type;
         $revision->article_id = $article->id;
 
-        $latestRevision = Revision::where('article_id', $article->id)->latest('revision_number')->first();
+        $latestRevision = RevisionArticle::where('article_id', $article->id)->latest('revision_number')->first();
         $revisionNumber = $latestRevision ? $latestRevision->revision_number + 1 : 1;
         $revision->revision_number = $revisionNumber;
 
@@ -101,7 +100,7 @@ class RevisionController extends BaseController
         return $this->handleResponseSuccess($revision, 'Create Article successfully!');
     }
 
-    public function show(Revision $revision)
+    public function show(RevisionArticle $revision)
     {
         $revision->categoris = $revision->categories()->where('status', 'public');
         $revision->revision_detail = $revision->revisionDetail()->get();
@@ -109,7 +108,7 @@ class RevisionController extends BaseController
         return $this->handleResponseSuccess('Get article successfully', $revision);
     }
 
-    public function update(Request $request, Revision $revision, Article $article){
+    public function update(Request $request, RevisionArticle $revision, Article $article){
         if(Auth::id() != $article->user_id){
             return $this->handleResponseErros([], 'you isn`t the author' );
         }
@@ -160,49 +159,11 @@ class RevisionController extends BaseController
         return $this->handleResponseSuccess($revision, 'Create Article successfully!');
     }
 
-    public function destroy(Revision $revision, Request $request){
+    public function destroy(RevisionArticle $revision, Request $request){
         $ID_delete = $request->input('ids');
 
             $revision->whereIn('id', $ID_delete)->delete();
-            return $this->handleResponseSuccess('Revision softDelete successfully!', []);
-    }
-
-
-    public function approve($id)
-    {
-        $revision = Revision::findOrFail($id);
-
-        if ($revision->status !== 'pending') {
-            return response()->json(['message' => 'You can only approve a pending revision.'], 403);
-        }
-
-        $article = Article::findOrFail($revision->article_id);
-
-        $article->update([
-            'name' => $revision->name,
-            'slug' => $revision->slug,
-            'content' => $revision->content,
-            'description' => $revision->description,
-            'seo_title' => $revision->seo_title,
-            'seo_description' => $revision->seo_description,
-            'status' => 'published',
-            'upload_id' => $revision->upload_id,
-        ]);
-
-        $article_details = DB::table('revision_detail')
-            ->where('article_id', $revision->article_id)
-            ->get();
-
-//        foreach ($article_details as $article_detail){
-//            $article_detail->update([
-//
-//            ]);
-//        }
-
-        $revision->status = 'approved';
-        $revision->save();
-
-        return response()->json(['message' => 'Revision has been approved and article updated.'], 200);
+            return $this->handleResponseSuccess('RevisionArticle softDelete successfully!', []);
     }
 
 }

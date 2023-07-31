@@ -169,6 +169,17 @@ class ArticleController extends BaseController
         return $this->handleResponseSuccess($article_detail, 'Article detail updated successfully');
     }
 
+    public function showRevison(Article $article){
+
+        if ($article->revisions()->get()->count() === 0 ) {
+            return response()->json(['message' => 'No revisions found for this article.'], 404);
+        }
+
+        $revision = $article->revisions()->get();
+
+        return $this->handleResponseSuccess($revision, 'Get revision for article successfully');
+    }
+
     public function restore(Request $request)
     {
         if (!Auth::user()->hasRole('admin')) {

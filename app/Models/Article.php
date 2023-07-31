@@ -34,6 +34,6 @@ class Article extends Model
     }
 
     public function revisions(){
-        return $this->hasMany(Revision::class);
+        return $this->hasMany(RevisionArticle::class);
     }
 }

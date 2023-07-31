@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\hasPermission;
 
-class Revision extends Model
+class RevisionArticle extends Model
 {
     use HasFactory, hasPermission;
 
@@ -31,5 +31,9 @@ class Revision extends Model
 
     public function revisionDetail(){
         return $this->hasMany(RevisionDetail::class);
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id', 'id')->through('');
     }
 }

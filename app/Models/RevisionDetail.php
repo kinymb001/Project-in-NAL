@@ -23,6 +23,6 @@ class RevisionDetail extends Model
     ];
 
     public function revision(){
-        return $this->belongsTo(Revision::class);
+        return $this->belongsTo(RevisionArticle::class);
     }
 }

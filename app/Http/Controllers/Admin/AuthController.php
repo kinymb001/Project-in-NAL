@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BaseController;
 use App\Mail\ApproveMail;
 use App\Models\Article;
+use App\Models\RevisionArticle;
 use App\Models\User;
 use App\Models\UserMetal;
 use Illuminate\Http\Request;
@@ -197,4 +198,42 @@ class AuthController extends BaseController
         return $this->handleResponseSuccess($article, 'Article status updated successfully');
     }
 
+
+    public function approveRevision(RevisionArticle $revision_article, Request $request)
+    {
+        if ($revision_article->status !== 'pending') {
+            return response()->json(['message' => 'You can only approve a pending revision.'], 403);
+        }
+
+        $article = Article::findOrFail($revision_article->article_id);
+
+        $article->update([
+            'name' => $revision_article->name,
+            'slug' => $revision_article->slug,
+            'content' => $revision_article->content,
+            'description' => $revision_article->description,
+            'seo_title' => $revision_article->seo_title,
+            'seo_description' => $revision_article->seo_description,
+            'status' => 'published',
+            'upload_id' => $revision_article->upload_id,
+        ]);
+
+        $languages = config('app.language_array');
+        foreach ($languages as $language) {
+            $revision_article_detail = $revision_article->revisionDetail()->where('lang', $language)->first();
+            $article_detail = $article->articleDetail->where('lang', $language)->first();
+            $article_detail->title = $revision_article_detail->title;
+            $article_detail->description = $revision_article_detail->description;
+            $article_detail->content = $revision_article_detail->content;
+            $article_detail->save();
+        }
+
+
+        $revision_article->status = 'approved';
+        $revision_article->save();
+
+        return response()->json(['message' => 'RevisionArticle has been approved and article updated.'], 200);
+    }
+
 }
+

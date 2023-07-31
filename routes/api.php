@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\User\UserController;
-use App\Http\Controllers\Admin\RevisionController;
+use App\Http\Controllers\User\TopPageController;
+use App\Http\Controllers\Admin\RevisionArticleController;
 use App\Http\Controllers\Admin\UploadController;
 use App\Models\Category;
 use App\Models\Post;
@@ -59,6 +61,8 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('/admin/users', [AuthController::class, 'index'])->can('viewAny', User::class);
     Route::post('/admin/update/{user}', [AuthController::class, 'update'])->can('update', User::class);
     Route::delete('/admin/delete/{user}', [AuthController::class, 'destroy'])->can('delete', User::class);
+    Route::post('/admin/approve/{article}', [AuthController::class, 'approve']);
+    Route::post('/admin/approve-revision/{revisionArticle}', [AuthController::class, 'approveRevision']);
 
     //route for post
     Route::get('/posts', [PostController::class, 'index']);
@@ -84,12 +88,27 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     //route for upload
     Route::post('/upload/store', [UploadController::class, 'store']);
 
-    //route for revision
-    Route::get('/revisions', [RevisionController::class, 'index']);
-    Route::post('/revision/create', [RevisionController::class, 'store']);
-    Route::get('/revision/{revision}', [RevisionController::class]);
-    Route::delete('/revision/{revision}', [RevisionController::class, 'destroy']);
-    Route::post('/revision/approve/{id}', [RevisionController::class, 'approve']);
+    //route for article
+    Route::get('/articles', [ArticleController::class, 'index']);
+    Route::post('/article/create', [ArticleController::class, 'store']);
+    Route::get('/article/{article}', [ArticleController::class, 'show']);
+    Route::get('/article/revision/{article}', [ArticleController::class, 'showRevison']);
+    Route::post('/article/update/{article}', [ArticleController::class, 'update']);
+    Route::post('/article/update-detail/{article}', [ArticleController::class, 'updateDetail']);
+    Route::delete('article/delete/{article}', [ArticleController::class, 'destroy']);
+
+
+    //route for revision article
+    Route::get('/revisions', [RevisionArticleController::class, 'index']);
+    Route::post('/revision/create', [RevisionArticleController::class, 'store']);
+    Route::get('/revision/{revision}', [RevisionArticleController::class, 'show']);
+    Route::delete('/revision/{revision}', [RevisionArticleController::class, 'destroy']);
+
+
+    //route for top page
+    Route::get('/top-pages', [TopPageController::class, 'index']);
+    Route::post('/top-page/create', [TopPageController::class, 'store']);
+    Route::get('/top-page/{top_page}', [TopPageController::class, 'show']);
 
 });
 

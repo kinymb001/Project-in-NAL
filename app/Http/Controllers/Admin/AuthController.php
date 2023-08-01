@@ -199,7 +199,6 @@ class AuthController extends BaseController
         return $this->handleResponseSuccess($article, 'Article status updated successfully');
     }
 
-
     public function approveRevision(RevisionArticle $revision_article, Request $request)
     {
         if ($revision_article->status !== 'pending') {
@@ -228,8 +227,6 @@ class AuthController extends BaseController
             $article_detail->content = $revision_article_detail->content;
             $article_detail->save();
         }
-
-
 
         $revision_article->status = 'published';
         $revision_article->save();

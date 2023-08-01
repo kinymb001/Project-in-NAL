@@ -114,10 +114,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 
     //route for dashboard
     Route::get('/dashboard/count', [DashboardController::class, 'statistics']);
-    Route::get('/dashboard/getPost', [DashboardController::class, 'PostRecords']);
-    Route::get('/dashboard/getArticle', [DashboardController::class, 'ArticleRecord']);
-    Route::get('/dashboard/getCategories', [DashboardController::class, 'CategoryRecord']);
-    Route::get('/dashboard/getRevision', [DashboardController::class, 'revisionArticleRecord']);
+    Route::get('/dashboard/getRecord', [DashboardController::class, 'Records']);
 
 });
 

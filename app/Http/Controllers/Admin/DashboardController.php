@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BaseController;
-use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Post;
 use App\Models\Article;
@@ -30,7 +29,7 @@ class DashboardController extends BaseController
         ]);
     }
 
-    public function PostRecords()
+    public function Records()
     {
         $posts = Post::all()->orderByDesc('created_at')->take(10)->get();
         foreach ($posts as $post){
@@ -38,35 +37,31 @@ class DashboardController extends BaseController
             $post->upload = Upload::find($posts->upload_id)->pluck('url');
         }
 
-        return $this->handleResponseSuccess($posts, 'get data successfully');
-    }
-
-    public function ArticleRecord(){
         $articles = Article::all()->orderByDesc('created_at')->take(10)->get();
         foreach ($articles as $article){
             $article->detail = $article->articleDetails()->get();
             $article->upload = Upload::find($article->upload_id)->pluck('url');
         }
 
-        return $this->handleResponseSuccess($articles, 'get data successfully');
-    }
-
-    public function CategoryRecord(){
         $categories = Category::all()->orderByDesc('created_at')->take(10)->get();
-        ;
         foreach ($categories as $category){
             $category->upload = Upload::find($category->upload_id)->pluck('url');
         }
-        return $this->handleResponseSuccess($categories, 'get data successfully');
-    }
 
-    public function revisionArticleRecord(){
         $revisionArtcles = RevisionArticle::all()->orderByDesc('created_at')->take(10)->get();
         foreach ($revisionArtcles as $revisionArtcle){
             $revisionArtcle->detail = $revisionArtcle->articleDetails()->get();
             $revisionArtcle->upload = Upload::find($revisionArtcle->upload_id)->pluck();
         }
 
-        return $this->handleResponseSuccess($revisionArtcles, 'get data successfully');
+        $record = [
+            'posts' => $posts,
+            'categories' => $categories,
+            'articles' => $articles,
+            'revisionArtcles' => $revisionArtcles
+        ];
+
+        return $this->handleResponseSuccess($record, 'get data successfully');
     }
+
 }

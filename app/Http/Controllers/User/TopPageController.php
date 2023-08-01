@@ -74,6 +74,9 @@ class TopPageController extends BaseController
         $top_page->area = $area;
         $top_page->about = $request->about;
         $top_page->summary = $request->summary;
+        $top_page->cover_image = $request->input('image_id') ?: null;
+        $top_page->profile_image = $request->input('cover_image_id') ?: null;
+        $top_page->intro_video = $request->input('video_id') ?: null;
         $top_page->official_website = $request->official_website;
         $top_page->fb_link = $request->fb_link;
         $top_page->insta_link = $request->insta_link;
@@ -133,13 +136,15 @@ class TopPageController extends BaseController
             'province' => $request->province
         ];
         $languages = config('app.language_array');
-
         $top_page->organization = $request->organization;
         $top_page->overview = $request->overview;
         $top_page->area = $area;
         $top_page->about = $request->about;
         $top_page->summary = $request->summary;
         $top_page->official_website = $request->official_website;
+        $top_page->cover_image = $request->input('image_id') ?: null;
+        $top_page->profile_image = $request->input('cover_image_id') ?: null;
+        $top_page->intro_video = $request->input('video_id') ?: null;
         $top_page->fb_link = $request->fb_link;
         $top_page->insta_link = $request->insta_link;
         $top_page->status = $request->status;
@@ -157,7 +162,7 @@ class TopPageController extends BaseController
             $top_page_detail->save();
         }
 
-        return $this->handleResponse($top_page, 'Top page updated successfully');
+        return $this->handleResponseSuccess($top_page, 'Top page updated successfully');
     }
 
     public function updateDetails(Request $request, TopPage $top_page)
@@ -186,6 +191,6 @@ class TopPageController extends BaseController
         $top_page_detail->lang = $language;
         $top_page_detail->save();
 
-        return $this->handleResponse($top_page_detail, 'Top page detail updated successfully');
+        return $this->handleResponseSuccess($top_page_detail, 'Top page detail updated successfully');
     }
 }

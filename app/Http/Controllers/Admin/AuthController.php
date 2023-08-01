@@ -245,7 +245,10 @@ class AuthController extends BaseController
             Mail::to($revision_article->user->email)->send(new RevisionStatusNotification($revision_article, $revision_article->status, $reason));
         }
 
-        $revision_article->delete();
+        $records = RevisionArticle::where('article_id', $revision_article->article_id)->get();
+        foreach ($records as $record){
+            $record->delete();
+        }
 
         return response()->json(['message' => 'RevisionArticle has been approved and article updated.'], 200);
     }

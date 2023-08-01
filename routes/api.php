@@ -106,7 +106,6 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 
 
     //route for top page
-    Route::get('/top-pages', [TopPageController::class, 'index']);
     Route::post('/top-page/create', [TopPageController::class, 'store']);
     Route::get('/top-page/{top_page}', [TopPageController::class, 'show']);
     Route::post('top-page/update/{top_page}', [TopPageController::class, 'update']);

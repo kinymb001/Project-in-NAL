@@ -12,33 +12,6 @@ use Illuminate\Support\Str;
 
 class TopPageController extends BaseController
 {
-    public function index(Request $request)
-    {
-        $status = $request->input('status');
-        $layout_status = ['active', 'inactive'];
-        $sort = $request->input('sort');
-        $sort_types = ['desc', 'asc'];
-        $sort_option = ['name', 'created_at', 'updated_at'];
-        $sort_by = $request->input('sort_by');
-        $status = in_array($status, $layout_status) ? $status : 'active';
-        $sort = in_array($sort, $sort_types) ? $sort : 'desc';
-        $sort_by = in_array($sort_by, $sort_option) ? $sort_by : 'created_at';
-        $search = $request->input('query');
-        $limit = request()->input('limit') ?? config('app.paginate');
-        $query = TopPage::select('*');
-
-        if ($status) {
-            $query = $query->where('status', $status);
-        }
-        if ($search) {
-            $query = $query->where('title', 'LIKE', '%' . $search . '%');
-        }
-        $TopPage = $query->orderBy($sort_by, $sort)->paginate($limit);
-
-        return $this->handleResponseSuccess($TopPage, 'TopPage data');
-    }
-
-
     public function store(Request $request)
     {
         $request->validate([
@@ -94,7 +67,7 @@ class TopPageController extends BaseController
             $top_page_detail->save();
         }
 
-        return $this->handleResponse($top_page, 'Top page created successfully');
+        return $this->handleResponseSuccess($top_page, 'Top page created successfully');
     }
 
     public function show(Request $request, TopPage $top_page)
@@ -113,10 +86,6 @@ class TopPageController extends BaseController
 
     public function update(Request $request, TopPage $top_page)
     {
-        if (!Auth::user()->hasPermission('update')) {
-            return $this->handleResponse([], 'Unauthorized')->setStatusCode(403);
-        }
-
         $request->validate([
             'organization' => 'required|max:255',
             'district' => 'required|max:255',

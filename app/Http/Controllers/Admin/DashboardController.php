@@ -32,7 +32,7 @@ class DashboardController extends BaseController
 
     public function PostRecords()
     {
-        $posts = Post::latest()->take(10)->get();
+        $posts = Post::all()->orderByDesc('created_at')->take(10)->get();
         foreach ($posts as $post){
             $post->detail = $post->post_detail()->get();
             $post->upload = Upload::find($posts->upload_id)->pluck('url');
@@ -42,7 +42,7 @@ class DashboardController extends BaseController
     }
 
     public function ArticleRecord(){
-        $articles = Article::latest()->take(10)->get();
+        $articles = Article::all()->orderByDesc('created_at')->take(10)->get();
         foreach ($articles as $article){
             $article->detail = $article->articleDetails()->get();
             $article->upload = Upload::find($article->upload_id)->pluck('url');
@@ -52,7 +52,8 @@ class DashboardController extends BaseController
     }
 
     public function CategoryRecord(){
-        $categories = Category::latest()->take(10)->get();
+        $categories = Category::all()->orderByDesc('created_at')->take(10)->get();
+        ;
         foreach ($categories as $category){
             $category->upload = Upload::find($category->upload_id)->pluck('url');
         }
@@ -60,7 +61,7 @@ class DashboardController extends BaseController
     }
 
     public function revisionArticleRecord(){
-        $revisionArtcles = RevisionArticle::latest()->take(10)->get();
+        $revisionArtcles = RevisionArticle::all()->orderByDesc('created_at')->take(10)->get();
         foreach ($revisionArtcles as $revisionArtcle){
             $revisionArtcle->detail = $revisionArtcle->articleDetails()->get();
             $revisionArtcle->upload = Upload::find($revisionArtcle->upload_id)->pluck();

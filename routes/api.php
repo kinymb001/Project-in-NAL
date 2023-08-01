@@ -8,6 +8,7 @@ use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\User\TopPageController;
 use App\Http\Controllers\Admin\RevisionArticleController;
 use App\Http\Controllers\Admin\UploadController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\User;
@@ -110,6 +111,10 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('/top-page/{top_page}', [TopPageController::class, 'show']);
     Route::post('top-page/update/{top_page}', [TopPageController::class, 'update']);
     Route::post('/top-page/update-detail/{top_page}', [TopPageController::class, 'updateDetails']);
+
+    //route for dashboard
+    Route::get('/dashboard/count', [DashboardController::class, 'statistics']);
+    Route::get('/dashboard/list', [DashboardController::class, 'latestRecords']);
 
 });
 

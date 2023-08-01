@@ -14,6 +14,14 @@ class TopPageController extends BaseController
 {
     public function store(Request $request)
     {
+
+        $user = auth()->user();
+        $existingTopPage = $user->topPage();
+
+        if ($existingTopPage) {
+            return response()->json(['message' => 'User already has a Top Page.'], 400);
+        }
+
         $request->validate([
             'organization' => 'required|max:255',
             'district' => 'required|max:255',

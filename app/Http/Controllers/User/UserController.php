@@ -16,7 +16,6 @@ class UserController extends BaseController
 
     public function register(Request $request)
     {
-        //Validate data
         $data = $request->only('name', 'email', 'password');
         $validator = Validator::make($data, [
             'name' => 'required|string',
@@ -24,12 +23,10 @@ class UserController extends BaseController
             'password' => 'required|string|min:6|max:50'
         ]);
 
-        //Send failed response if request is not valid
         if ($validator->fails()) {
             return response()->json(['error' => $validator->messages()], 200);
         }
 
-        //Request is valid, create new user
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -38,7 +35,6 @@ class UserController extends BaseController
         $user->roles()->sync([3]);
         event(new Registered($user));
 
-        //User created, return success response
         return $this->handleResponseSuccess($user, 'Register Successfully');
     }
     public function login(Request $request){

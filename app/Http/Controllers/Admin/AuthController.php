@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\BaseController;
 use App\Mail\ApproveMail;
+use App\Mail\RevisionStatusNotification;
 use App\Models\Article;
 use App\Models\RevisionArticle;
 use App\Models\User;
@@ -229,8 +230,22 @@ class AuthController extends BaseController
         }
 
 
-        $revision_article->status = 'approved';
+
+        $revision_article->status = 'published';
         $revision_article->save();
+
+        $reason = '';
+        if ($revision_article->status === 'published') {
+            $reason = 'Your article has been published';
+        } elseif ($revision_article->status === 'Reject') {
+            $reason = 'Your article has been rejected';
+        }
+
+        if ($revision_article->status === 'approved' || $revision_article->status === 'rejected') {
+            Mail::to($revision_article->user->email)->send(new RevisionStatusNotification($revision_article, $revision_article->status, $reason));
+        }
+
+        $revision_article->delete();
 
         return response()->json(['message' => 'RevisionArticle has been approved and article updated.'], 200);
     }

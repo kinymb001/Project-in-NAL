@@ -8,7 +8,6 @@ use App\Models\TopPageDetail;
 use App\Models\Upload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 
 class TopPageController extends BaseController
 {

@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\BaseController;
-use App\Models\User;
-use App\Models\Post;
 use App\Models\Article;
 use App\Models\Category;
+use App\Models\Post;
 use App\Models\RevisionArticle;
 use App\Models\Upload;
+use App\Models\User;
 
 class DashboardController extends BaseController
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\BaseController;
 use App\Models\Post;
@@ -14,6 +14,9 @@ class PostController extends BaseController
 {
     public function index(Request $request)
     {
+        $language = $request->input('language');
+        $languages = config('app.language_array');
+        $language = in_array($language, $languages) ? $language : '';
         $status = $request->input('status');
         $layout_status = ['public', 'unpublic'];
         $sort = $request->input('sort');
@@ -33,6 +36,14 @@ class PostController extends BaseController
         }
         if($search){
             $query = $query->where('name', 'LIKE', '%'.$search.'%');
+        }
+        if ($language){
+            $query = $query->whereHas('post_detail', function ($qr) use ($language) {
+                $qr->where('language', $language);
+            });
+            $query = $query->with(['post_detail' => function ($qr) use ($language) {
+                $qr->where('language', $language);
+            }]);
         }
         $posts = $query->orderBy($sort_by, $sort)->paginate($limit);
 
@@ -120,7 +131,6 @@ class PostController extends BaseController
             'categories' => 'required|array',
             'upload_ids' => 'array'
         ]);
-
 
         $post->name = $request->name;
         $post->slug = Str::of($request->name)->slug('-');

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\BaseController;
 use App\Models\Article;
@@ -17,6 +17,9 @@ class ArticleController extends BaseController
 
     public function index(Request $request)
     {
+        $language = $request->input('language');
+        $languages = config('app.language_array');
+        $language = in_array($language, $languages) ? $language : '';
         $status = $request->input('status');
         $layout_status = ['pending', 'published', 'reject'];
         $sort = $request->input('sort');
@@ -36,6 +39,14 @@ class ArticleController extends BaseController
         }
         if ($search) {
             $query = $query->where('name', 'LIKE', '%' . $search . '%');
+        }
+        if ($language){
+            $query = $query->whereHas('articleDetail', function ($qr) use ($language) {
+                $qr->where('language', $language);
+            });
+            $query = $query->with(['articleDetail' => function ($qr) use ($language) {
+                $qr->where('language', $language);
+            }]);
         }
         $articles = $query->orderBy($sort_by, $sort)->paginate($limit);
 
@@ -94,7 +105,7 @@ class ArticleController extends BaseController
     {
         $article->categoris = $article->categories()->where('status', 'public');
         $article->article_detail = $article->articleDetails()->get();
-        $article->uploads = Upload::find($article->upload_id);
+        $article->uploads = Upload::find($article->upload_id)->pluck('url');
         return $this->handleResponseSuccess('Get article successfully', $article);
     }
 
@@ -128,7 +139,7 @@ class ArticleController extends BaseController
         $article->status = 'pending';
         $article->content = $request->contents;
         if ($request->upload_ids){
-            $article->upload_id = $request->upload_ids;
+            $article->upload_id = json_encode($request->upload_ids);
             deleteImage($request->upload_ids);
         }
         $article->save();

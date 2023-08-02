@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\BaseController;
 use App\Models\Category;
@@ -61,11 +61,6 @@ class CategoryController extends BaseController
             deleteImage($request->upload_ids);
         }
         $category->type = $request->type;
-        if ($request->hasFile('image')) {
-            $image = $request->image;
-            $imagePath = $image->storeAs('public/upload/' . date('Y/m/d'), Str::random(10));
-            $category->image_url = asset(Storage::url($imagePath));
-        }
         $category->save();
 
         return $this->handleResponseSuccess($category, 'Create Category successfully!');

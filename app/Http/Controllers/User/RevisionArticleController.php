@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\BaseController;
 use App\Models\Article;
-use App\Models\ArticleDetail;
 use App\Models\RevisionArticle;
 use App\Models\RevisionDetail;
 use App\Models\Upload;
@@ -17,6 +16,9 @@ class RevisionArticleController extends BaseController
     const SEO_KEYS = ['Article', 'Development', 'SEO'];
 
     public function index(Request $request){
+        $language = $request->input('language');
+        $languages = config('app.language_array');
+        $language = in_array($language, $languages) ? $language : '';
         $status = $request->input('status');
         $layout_status = ['pending', 'approved', 'reject'];
         $sort = $request->input('sort');
@@ -36,6 +38,14 @@ class RevisionArticleController extends BaseController
         }
         if ($search) {
             $query = $query->where('name', 'LIKE', '%' . $search . '%');
+        }
+        if ($language){
+            $query = $query->whereHas('revision_detail', function ($qr) use ($language) {
+                $qr->where('language', $language);
+            });
+            $query = $query->with(['revision_detail' => function ($qr) use ($language) {
+                $qr->where('language', $language);
+            }]);
         }
         $revision = $query->orderBy($sort_by, $sort)->paginate($limit);
 

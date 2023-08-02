@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\BaseController;
 use App\Models\Upload;
@@ -14,8 +14,9 @@ class UploadController extends BaseController
     public function store(Request  $request){
 
         $request->validate([
-            'images' => 'required|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'video' => 'mimes:mp4,mov,avi|max:10000',
+            'cover_image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $uploadedImageId = $this->createUploadRecord($request->file('image'));

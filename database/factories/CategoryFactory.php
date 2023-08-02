@@ -27,7 +27,7 @@ class CategoryFactory extends Factory
             'description' => $this->faker->paragraph,
             'status' => $this->faker->randomElement(['public', 'un_public']),
             'type' => $this->faker->title,
-            'image_url' => $this->faker->url,
+            'upload_id' => null,
         ];
     }
 }

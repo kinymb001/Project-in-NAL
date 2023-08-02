@@ -2,13 +2,14 @@
 
 namespace Database\Seeders;
 
-use App\Models\Post;
+use App\Models\Article;
 use Illuminate\Database\Seeder;
 
-class PostSeeder extends Seeder
+class ArticleSeeder extends Seeder
 {
+
     public function run()
     {
-        Post::factory()->count(100)->create();
+        Article::factory()->count(100)->create();
     }
 }

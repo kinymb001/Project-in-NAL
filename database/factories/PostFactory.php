@@ -10,10 +10,8 @@ use App\Models\PostMetal;
 use App\Models\PostDetail;
 use Illuminate\Support\Str;
 
-
 class PostFactory extends Factory
 {
-
     public function definition()
     {
         $user_ids = User::whereHas('roles', function ($query) {

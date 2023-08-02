@@ -16,7 +16,7 @@ class CreateRevisionDetailTable extends Migration
         Schema::create('revision_detail', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('slug')->index()->unique();
+            $table->string('slug')->index();
             $table->text('description')->nullable();
             $table->longText('contents')->nullable();
             $table->string('language')->nullable();

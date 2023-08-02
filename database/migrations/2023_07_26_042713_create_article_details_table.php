@@ -16,12 +16,10 @@ class CreateArticleDetailsTable extends Migration
         Schema::create('article_details', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('slug')->index()->unique();
+            $table->string('slug')->index();
             $table->text('description')->nullable();
             $table->longText('contents')->nullable();
             $table->string('language')->nullable();
-            $table->string('seo_title')->nullable();
-            $table->string('seo_description')->nullable();
             $table->foreignId('article_id')
                 ->references('id')
                 ->on('articles')
